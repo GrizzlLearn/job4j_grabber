@@ -73,7 +73,7 @@ public class AlertRabbit {
      */
     private static Properties loadProp() throws IOException{
         Properties tmp = new Properties();
-        try (InputStream fileInputStream = new FileInputStream("./src/main/resources/rabbit.properties")) {
+        try (InputStream fileInputStream = AlertRabbit.class.getClassLoader().getResourceAsStream("rabbit.properties")) {
             tmp.load(fileInputStream);
         }
 
