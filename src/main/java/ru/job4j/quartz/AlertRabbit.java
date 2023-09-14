@@ -16,36 +16,25 @@ import static org.quartz.SimpleScheduleBuilder.*;
 
 public class AlertRabbit {
 
-    private static final String path = "./src/main/resources/app.properties";
-    private final Properties config;
-    private final Connection cn;
-
-    public AlertRabbit(Properties config, Connection cn) {
-        this.config = config;
-        this.cn = cn;
-    }
-
     /**
      * Main инициализирует Scheduler, JobDetail, SimpleScheduleBuilder и trigger и запускает job.
      * @see AlertRabbit#main(String[]) 
      * @param args Массив аргументов командной строки, переданных программе при запуске.
      * @throws IOException если происходит ошибка при чтении файла настроек.
-     * @throws ClassNotFoundException
-     * @throws SQLException
+     * @throws ClassNotFoundException Если класс не может быть найден во время выполнения.
+     * @throws SQLException Если произошла ошибка при подключении к БД.
      * @see AlertRabbit#loadProp()
      */
     public static void main(String[] args) throws IOException, SQLException, ClassNotFoundException {
-        Properties cfg = loadProp();
-        Connection cn = dbConnection(cfg);
-        AlertRabbit alertRabbit = new AlertRabbit(cfg, cn);
-        Optional<String> propVal = Optional.ofNullable(alertRabbit.config.getProperty("rabbit.interval"));
         int interval = 0;
+        Properties cfg = loadProp();
+        try (Connection cn = dbConnection(cfg)) {
+            Optional<String> propVal = Optional.ofNullable(cfg.getProperty("rabbit.interval"));
 
-        if (propVal.isPresent()) {
-            interval = Integer.parseInt(propVal.get());
-        }
+            if (propVal.isPresent()) {
+                interval = Integer.parseInt(propVal.get());
+            }
 
-        try {
             Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
             scheduler.start();
             JobDataMap data = new JobDataMap();
@@ -90,19 +79,17 @@ public class AlertRabbit {
                 s.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
                 s.execute();
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
     }
 
     /**
      * Метод выполняет чтение файла настроек и отдаёт их наружу
-     * @return Объект Properties представляющий настройки для SimpleScheduleBuilder.
+     * @return Объект Properties содержащий в себе настройки для SimpleScheduleBuilder.
      * @throws IOException если происходит ошибка при чтении файла настроек.
-     * @throws ClassNotFoundException
-     * @throws SQLException
      */
-    private static Properties loadProp() throws IOException, ClassNotFoundException, SQLException {
+    private static Properties loadProp() throws IOException {
         Properties tmp = new Properties();
         try (InputStream fileInputStream = AlertRabbit.class.getClassLoader().getResourceAsStream("rabbit.properties")) {
             tmp.load(fileInputStream);
@@ -112,11 +99,11 @@ public class AlertRabbit {
     }
 
     /**
-     *
-     * @param prop
-     * @return
-     * @throws ClassNotFoundException
-     * @throws SQLException
+     * Метод выполняет соединение с БД PostgreQL
+     * @param prop Объект Properties содержащий в себе настройки для SimpleScheduleBuilder.
+     * @return Объект Connection всю необходимую информацию для работы с БД.
+     * @throws ClassNotFoundException Если класс не может быть найден во время выполнения.
+     * @throws SQLException Если произошла ошибка при подключении к БД.
      */
     private static Connection dbConnection(Properties prop) throws ClassNotFoundException, SQLException {
         Class.forName(prop.getProperty("jdbc.driver"));
