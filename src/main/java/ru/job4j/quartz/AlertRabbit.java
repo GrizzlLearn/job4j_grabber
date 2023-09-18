@@ -24,11 +24,14 @@ public class AlertRabbit {
      * @throws ClassNotFoundException Если класс не может быть найден во время выполнения.
      * @throws SQLException Если произошла ошибка при подключении к БД.
      * @see AlertRabbit#loadProp()
+     * @see AlertRabbit#prepareTable(Connection)
+     * @see AlertRabbit#dbConnection(Properties)
      */
     public static void main(String[] args) throws IOException, SQLException, ClassNotFoundException {
         int interval = 0;
         Properties cfg = loadProp();
         try (Connection cn = dbConnection(cfg)) {
+            prepareTable(cn);
             Optional<String> propVal = Optional.ofNullable(cfg.getProperty("rabbit.interval"));
 
             if (propVal.isPresent()) {
@@ -70,7 +73,10 @@ public class AlertRabbit {
         }
         @Override
         public void execute(JobExecutionContext context) {
-            Connection cn = (Connection) context.getJobDetail().getJobDataMap().get("connect");
+            Connection cn = (Connection) context
+                    .getJobDetail()
+                    .getJobDataMap()
+                    .get("connect");
             String tableName = "rabbit";
             String sql = String.format("INSERT INTO %s(created_date) VALUES(?);",
                     tableName
@@ -91,11 +97,29 @@ public class AlertRabbit {
      */
     private static Properties loadProp() throws IOException {
         Properties tmp = new Properties();
-        try (InputStream fileInputStream = AlertRabbit.class.getClassLoader().getResourceAsStream("rabbit.properties")) {
+        try (InputStream fileInputStream = AlertRabbit.class
+                .getClassLoader()
+                .getResourceAsStream("rabbit.properties")) {
             tmp.load(fileInputStream);
         }
 
         return tmp;
+    }
+
+    /**
+     * Метод создаёт нужную таблицу в БД, если её не существует.
+     * @param cn Объект Connection для выполнения sql запроса.
+     * @throws SQLException Если произошла ошибка при выполнении запроса.
+     */
+    private static void prepareTable(Connection cn) throws SQLException {
+        String sql = String.format("CREATE TABLE IF NOT EXISTS %s(%s);",
+                "rabbit",
+                "created_date TIMESTAMP NOT NULL"
+                );
+        System.out.println();
+        try (PreparedStatement s = cn.prepareStatement(sql)) {
+            s.execute();
+        }
     }
 
     /**
