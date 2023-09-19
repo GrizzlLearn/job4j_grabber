@@ -116,7 +116,6 @@ public class AlertRabbit {
                 "rabbit",
                 "created_date TIMESTAMP NOT NULL"
                 );
-        System.out.println();
         try (PreparedStatement s = cn.prepareStatement(sql)) {
             s.execute();
         }
