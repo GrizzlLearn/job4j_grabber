@@ -35,6 +35,7 @@ public class HabrCareerParse {
             HabrCareerDateTimeParser hcdtp = new HabrCareerDateTimeParser();
             try {
                 LocalDateTime dateTimeParser = hcdtp.parse(dateTimeString);
+                System.out.println(dateTimeString);
                 System.out.printf("%s %s %s%n", vacancyName, link, dateTimeParser);
             } catch (ParseException e) {
                 e.printStackTrace();
