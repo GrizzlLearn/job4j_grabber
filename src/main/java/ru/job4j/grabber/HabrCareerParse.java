@@ -19,26 +19,30 @@ public class HabrCareerParse {
 
     private static final String PAGE_LINK = String.format("%s/vacancies/java_developer", SOURCE_LINK);
 
-    public static void main(String[] args) throws IOException {
-        Connection connection = Jsoup.connect(PAGE_LINK);
-        Document document = connection.get();
-        Elements rows = document.select(".vacancy-card__inner");
+    private static final String PAGE_NUMBER = String.format(PAGE_LINK + "%s", "?page=");
 
-        rows.forEach(row -> {
-            Element titleElement = row.select(".vacancy-card__title").first();
-            Element linkElement = titleElement.child(0);
-            String vacancyName = titleElement.text();
-            Element dateElement = row.select(".vacancy-card__date").first();
-            Element fullDateElement = dateElement.child(0);
-            String dateTimeString = fullDateElement.attr("datetime");
-            String link = String.format("%s%s", SOURCE_LINK, linkElement.attr("href"));
-            HabrCareerDateTimeParser hcdtp = new HabrCareerDateTimeParser();
-            try {
-                LocalDateTime dateTimeParser = hcdtp.parse(dateTimeString);
-                System.out.printf("%s %s %s%n", vacancyName, link, dateTimeParser);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        });
+    public static void main(String[] args) throws IOException {
+        for (int i = 1; i <= 5; i++) {
+            Connection connection = Jsoup.connect(String.format(PAGE_NUMBER + "%s", i));
+            Document document = connection.get();
+            Elements rows = document.select(".vacancy-card__inner");
+
+            rows.forEach(row -> {
+                Element titleElement = row.select(".vacancy-card__title").first();
+                Element linkElement = titleElement.child(0);
+                String vacancyName = titleElement.text();
+                Element dateElement = row.select(".vacancy-card__date").first();
+                Element fullDateElement = dateElement.child(0);
+                String dateTimeString = fullDateElement.attr("datetime");
+                String link = String.format("%s%s", SOURCE_LINK, linkElement.attr("href"));
+                HabrCareerDateTimeParser hcdtp = new HabrCareerDateTimeParser();
+                try {
+                    LocalDateTime dateTimeParser = hcdtp.parse(dateTimeString);
+                    System.out.printf("%s %s %s%n", vacancyName, link, dateTimeParser);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
     }
 }
