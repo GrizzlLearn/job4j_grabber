@@ -71,6 +71,7 @@ public class AlertRabbit {
         public Rabbit() {
             System.out.println("Rabbit runs here ...");
         }
+
         @Override
         public void execute(JobExecutionContext context) {
             Connection cn = (Connection) context
