@@ -63,12 +63,7 @@ public class Post {
 
     @Override
     public int hashCode() {
-        int result = id;
-        result = 31 * result + title.hashCode();
-        result = 31 * result + link.hashCode();
-        result = 31 * result + description.hashCode();
-        result = 31 * result + created.hashCode();
-        return result;
+        return id;
     }
 
     @Override
