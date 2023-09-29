@@ -9,9 +9,7 @@ import ru.job4j.grabber.utils.HabrCareerDateTimeParser;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 public class HabrCareerParse {
 
@@ -36,13 +34,27 @@ public class HabrCareerParse {
                 String dateTimeString = fullDateElement.attr("datetime");
                 String link = String.format("%s%s", SOURCE_LINK, linkElement.attr("href"));
                 HabrCareerDateTimeParser hcdtp = new HabrCareerDateTimeParser();
+
                 try {
                     LocalDateTime dateTimeParser = hcdtp.parse(dateTimeString);
                     System.out.printf("%s %s %s%n", vacancyName, link, dateTimeParser);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
+
+                try {
+                    System.out.println(retrieveDescription(link));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             });
         }
+    }
+
+    private static String retrieveDescription(String link) throws IOException {
+        Connection connection = Jsoup.connect(link);
+        Document document = connection.get();
+        Elements body = document.select(".vacancy-description__text");
+        return body.text();
     }
 }
