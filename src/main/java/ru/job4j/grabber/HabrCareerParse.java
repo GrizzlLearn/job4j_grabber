@@ -17,11 +17,11 @@ public class HabrCareerParse {
 
     private static final String PAGE_LINK = String.format("%s/vacancies/java_developer", SOURCE_LINK);
 
-    private static final String PAGE_NUMBER = String.format(PAGE_LINK + "%s", "?page=");
+    private static final String PAGE_NUMBER = String.format("%s%s", PAGE_LINK, "?page=");
 
     public static void main(String[] args) throws IOException {
         for (int i = 1; i <= 5; i++) {
-            Connection connection = Jsoup.connect(String.format(PAGE_NUMBER + "%s", i));
+            Connection connection = Jsoup.connect(String.format("%s%s", PAGE_NUMBER, i));
             Document document = connection.get();
             Elements rows = document.select(".vacancy-card__inner");
 
