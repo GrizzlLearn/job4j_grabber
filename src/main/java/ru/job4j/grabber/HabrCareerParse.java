@@ -82,7 +82,6 @@ public class HabrCareerParse implements Parse {
         return result;
     }
 
-
     /**
      * Метод принимает ссылку на конкретную вакансию и из полученных данных с помощью метода retrieveVacancy,
      * формирует объект Post
