@@ -58,12 +58,17 @@ public class Post {
             return false;
         }
 
-        return id == post.id;
+        if (id != post.id) {
+            return false;
+        }
+        return link.equals(post.link);
     }
 
     @Override
     public int hashCode() {
-        return id;
+        int result = id;
+        result = 31 * result + link.hashCode();
+        return result;
     }
 
     @Override
