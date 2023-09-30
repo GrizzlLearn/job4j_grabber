@@ -9,9 +9,7 @@ import ru.job4j.grabber.utils.HabrCareerDateTimeParser;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 public class HabrCareerParse {
 
@@ -19,11 +17,11 @@ public class HabrCareerParse {
 
     private static final String PAGE_LINK = String.format("%s/vacancies/java_developer", SOURCE_LINK);
 
-    private static final String PAGE_NUMBER = String.format(PAGE_LINK + "%s", "?page=");
+    private static final String PAGE_NUMBER = String.format("%s%s", PAGE_LINK, "?page=");
 
     public static void main(String[] args) throws IOException {
         for (int i = 1; i <= 5; i++) {
-            Connection connection = Jsoup.connect(String.format(PAGE_NUMBER + "%s", i));
+            Connection connection = Jsoup.connect(String.format("%s%s", PAGE_NUMBER, i));
             Document document = connection.get();
             Elements rows = document.select(".vacancy-card__inner");
 
@@ -36,13 +34,27 @@ public class HabrCareerParse {
                 String dateTimeString = fullDateElement.attr("datetime");
                 String link = String.format("%s%s", SOURCE_LINK, linkElement.attr("href"));
                 HabrCareerDateTimeParser hcdtp = new HabrCareerDateTimeParser();
+
                 try {
                     LocalDateTime dateTimeParser = hcdtp.parse(dateTimeString);
                     System.out.printf("%s %s %s%n", vacancyName, link, dateTimeParser);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
+
+                try {
+                    System.out.println(retrieveDescription(link));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             });
         }
+    }
+
+    private static String retrieveDescription(String link) throws IOException {
+        Connection connection = Jsoup.connect(link);
+        Document document = connection.get();
+        Elements body = document.select(".vacancy-description__text");
+        return body.text();
     }
 }
