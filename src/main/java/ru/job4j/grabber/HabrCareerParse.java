@@ -21,14 +21,16 @@ public class HabrCareerParse implements Parse {
 
     private static final String PAGE_NUMBER = String.format("%s%s", PAGE_LINK, "?page=");
 
-    HabrCareerParse(DateTimeParser dateTimeParser) {
+    private static final int PAGE_COUNT = 5;
+
+    public HabrCareerParse(DateTimeParser dateTimeParser) {
         this.dateTimeParser = dateTimeParser;
     }
 
     public static void main(String[] args) {
         HabrCareerParse hcp = new HabrCareerParse(new HabrCareerDateTimeParser());
 
-        for (int i = 1; i <= 5; i++) {
+        for (int i = 1; i <= PAGE_COUNT; i++) {
             String sourceLink = String.format("%s%s", PAGE_NUMBER, i);
             System.out.println(hcp.list(sourceLink));
         }
@@ -83,8 +85,7 @@ public class HabrCareerParse implements Parse {
     }
 
     /**
-     * Метод принимает ссылку на конкретную вакансию и из полученных данных с помощью метода retrieveVacancy,
-     * формирует объект Post
+     * Метод принимает ссылку на конкретную вакансию и, с помощью метода retrieveVacancy, формирует объект Post.
      *
      * @param vacLink ссылка на вакансию
      * @return объект типа Post
