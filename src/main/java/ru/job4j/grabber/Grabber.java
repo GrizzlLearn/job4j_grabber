@@ -48,12 +48,12 @@ public class Grabber implements Grab {
         @Override
         public void execute(JobExecutionContext context) {
             JobDataMap map = context.getJobDetail().getJobDataMap();
-            String link = "https://career.habr.com/vacancies/java_developer?page=";
+            String habrLink = "https://career.habr.com/vacancies/java_developer?page=";
             Store store = (Store) map.get("store");
             Parse parse = (Parse) map.get("parse");
             List<Post> fullList = new ArrayList<>();
             for (int i = 1; i <= 5; i++) {
-                String fin = String.format("%s%s", link, i);
+                String fin = String.format("%s%s", habrLink, i);
                 fullList.addAll(parse.list(fin));
             }
             for (Post post : fullList) {
