@@ -132,24 +132,4 @@ public class PsqlStore implements Store {
         }
     }
 
-    public static void main(String[] args) {
-        Properties cfg = new Properties();
-        try (InputStream in = PsqlStore.class.getClassLoader().getResourceAsStream("postgreSQL.properties")) {
-            cfg.load(in);
-            PsqlStore store = new PsqlStore(cfg);
-            Post post = new Post();
-            post.setLink("test link");
-            post.setTitle("test title");
-            post.setDescription("test description");
-            post.setCreated(LocalDateTime.now().withNano(0));
-            store.save(post);
-            System.out.println(store.getAll().toString());
-            System.out.println(System.lineSeparator());
-            System.out.println(store.findById(1));
-            System.out.println(System.lineSeparator());
-            System.out.println(store.findById(2));
-        } catch (IOException | SQLException e) {
-            e.printStackTrace();
-        }
-    }
 }
