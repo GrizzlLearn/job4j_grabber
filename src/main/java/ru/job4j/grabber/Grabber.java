@@ -62,7 +62,6 @@ public class Grabber implements Grab {
         }
     }
 
-
     public static void main(String[] args) throws Exception {
         var cfg = new Properties();
         try (InputStream in = Grabber.class.getClassLoader()
