@@ -16,6 +16,10 @@ public class HabrCareerParse implements Parse {
 
     private static final String SOURCE_LINK = "https://career.habr.com";
 
+    public final static String HABR_LINK = "https://career.habr.com/vacancies/java_developer?page=";
+
+    public final static Integer PAGE_COUNT = 5;
+
     public HabrCareerParse(DateTimeParser dateTimeParser) {
         this.dateTimeParser = dateTimeParser;
     }

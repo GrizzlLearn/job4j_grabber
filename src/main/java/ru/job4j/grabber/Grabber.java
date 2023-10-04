@@ -5,6 +5,7 @@ import org.quartz.impl.StdSchedulerFactory;
 import ru.job4j.grabber.utils.HabrCareerDateTimeParser;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.Charset;
@@ -56,8 +57,21 @@ public class Grabber implements Grab {
             Store store = (Store) map.get("store");
             Parse parse = (Parse) map.get("parse");
             List<Post> fullList = new ArrayList<>();
-            for (int i = 1; i <= 5; i++) {
-                String fin = String.format("%s%s", habrLink, i);
+            String link;
+            int pageCount;
+
+            try {
+                Field fLInk = parse.getClass().getField("HABR_LINK");
+                Field fPageCount = parse.getClass().getField("PAGE_COUNT");
+                link = (String) fLInk.get(parse);
+                pageCount = (Integer) fPageCount.get(parse);
+
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+
+            for (int i = 1; i <= pageCount; i++) {
+                String fin = String.format("%s%s", link, i);
                 fullList.addAll(parse.list(fin));
             }
             for (Post post : fullList) {
