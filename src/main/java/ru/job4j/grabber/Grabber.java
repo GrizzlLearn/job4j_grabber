@@ -53,30 +53,10 @@ public class Grabber implements Grab {
         @Override
         public void execute(JobExecutionContext context) {
             JobDataMap map = context.getJobDetail().getJobDataMap();
-            String habrLink = "https://career.habr.com/vacancies/java_developer?page=";
+            String habrLink = "https://career.habr.com/";
             Store store = (Store) map.get("store");
             Parse parse = (Parse) map.get("parse");
-            List<Post> fullList = new ArrayList<>();
-            String link;
-            int pageCount;
-
-            try {
-                Field fLInk = parse.getClass().getField("HABR_LINK");
-                Field fPageCount = parse.getClass().getField("PAGE_COUNT");
-                link = (String) fLInk.get(parse);
-                pageCount = (Integer) fPageCount.get(parse);
-
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-
-            for (int i = 1; i <= pageCount; i++) {
-                String fin = String.format("%s%s", link, i);
-                fullList.addAll(parse.list(fin));
-            }
-            for (Post post : fullList) {
-                store.save(post);
-            }
+            parse.list(habrLink).forEach(store::save);
         }
     }
 
