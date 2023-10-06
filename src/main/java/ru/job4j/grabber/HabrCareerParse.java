@@ -16,6 +16,12 @@ public class HabrCareerParse implements Parse {
 
     private static final String SOURCE_LINK = "https://career.habr.com";
 
+    private static final String VAC_LINK = "/vacancies/java_developer";
+
+    private static final String PAGE_LINK = "?page=";
+
+    public final static Integer PAGE_COUNT = 5;
+
     public HabrCareerParse(DateTimeParser dateTimeParser) {
         this.dateTimeParser = dateTimeParser;
     }
@@ -103,12 +109,17 @@ public class HabrCareerParse implements Parse {
     @Override
     public List<Post> list(String link) {
         List<Post> result = new ArrayList<>();
-        List<String> allLinks;
-        try {
-            allLinks = new ArrayList<>(getVacancyLinks(link));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        List<String> allLinks = new ArrayList<>();
+
+        for (int i = 1; i <= PAGE_COUNT; i++) {
+            String pagedVacLink = String.format("%s%s%s%s", link, VAC_LINK, PAGE_LINK, i);
+            try {
+                allLinks.addAll(getVacancyLinks(pagedVacLink));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
+
         for (String vacLink : allLinks) {
             try {
                 result.add(postBuilder(vacLink));
@@ -116,6 +127,7 @@ public class HabrCareerParse implements Parse {
                 throw new RuntimeException(e);
             }
         }
+
         return result;
     }
 }
